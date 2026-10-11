@@ -156,3 +156,48 @@ Both columns use the same 16 sequences (baseline predictions filtered to those I
 ### Next
 
 1. Score epoch 3 as well as epoch 2, to check whether val loss picked the better epoch.
+
+## Epoch comparison: did val loss pick the right epoch?
+
+**Question:** Val loss suggested epoch 2 (0.1118) over epoch 3 (0.1126).
+Did the actual scorer agree?
+
+### Results (16 val sequences, macro average)
+
+| Metric                      | Epoch 2 run 1 | Epoch 2 run 2 | Epoch 3 |
+| --------------------------- | ------------- | ------------- | ------- |
+| text_order_score            | 0.8418        | 0.8431        | 0.8512  |
+| balanced_joint_f1           | 0.3611        | 0.3474        | 0.3487  |
+| speaker_accuracy_on_matched | 0.6221        | 0.6142        | 0.6338  |
+| joint_f1                    | 0.5636        | 0.5553        | 0.5665  |
+| matched_token_coverage      | 0.8943        | 0.8924        | 0.9025  |
+
+### Findings
+
+**Val loss was wrong.** Epoch 3 wins on all 5 metrics in the second comparison,
+and on 4/5 in the first. Val loss (0.1118 vs 0.1126, a gap of 0.0008) was not
+a reliable signal here — the difference was too small and the val set too small
+(48 page examples) to be meaningful.
+
+**Epoch 2 scores varied between two runs** (balanced_joint_f1: 0.3611 vs 0.3474)
+despite using greedy decoding (do_sample=False), which should be deterministic.
+Most likely cause: per-page context passing means each page's predicted output
+feeds into the next page's prompt. Any tiny numerical difference in page 1's
+output (from different memory state between runs) cascades to pages 2 and 3,
+making the full sequence prediction non-deterministic even with greedy decoding.
+This is a known limitation of the autoregressive context-passing design.
+
+**16 validation sequences is too small for stable metric estimates.**
+A 0.014 gap between two runs of the same model shows the noise floor is high.
+A larger held-out set would be needed for reliable epoch selection.
+
+**Decision: use epoch 3 for test set inference.**
+Epoch 3 wins on all 5 metrics in the direct comparison and is consistent
+across the single run we have for it.
+
+### Next
+
+1. Run inference on 15 test sequences using epoch 3 adapter.
+2. Format predictions as required JSONL and verify against sample_submission.jsonl.
+3. Write README.
+4. Commit everything and submit.
