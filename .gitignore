@@ -1,0 +1,44 @@
+# ---------- Environment ----------
+.venv/
+venv/
+env/
+.env
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# ---------- Jupyter ----------
+.ipynb_checkpoints/
+
+# ---------- Dataset (provided by the task, large) ----------
+/dataset/
+
+# ---------- Model weights and training artifacts ----------
+# Adapters/checkpoints are large; share them via a download link
+# (Hugging Face Hub / Drive) and put the link in the README.
+checkpoints/
+adapters/
+runs/
+wandb/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.gguf
+
+# ---------- Logs and caches ----------
+logs/*.log
+.cache/
+.huggingface/
+
+# ---------- OS / editor junk ----------
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+.vscode/
+.idea/
