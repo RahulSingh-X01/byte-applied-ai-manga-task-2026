@@ -199,5 +199,3 @@ across the single run we have for it.
 
 1. Run inference on 15 test sequences using epoch 3 adapter.
 2. Format predictions as required JSONL and verify against sample_submission.jsonl.
-3. Write README.
-4. Commit everything and submit.
